@@ -24,7 +24,7 @@ pipeline {
 
         stage('checkout scm') {
             steps {
-                checkout scmGit(branches: [[name: "$BRANCH_NAME"]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/weiweier22/k8s-cicd-demo.git']])
+                checkout scmGit(branches: [[name: params.BRANCH_NAME]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/weiweier22/k8s-cicd-demo.git']])
             }
         }
 
