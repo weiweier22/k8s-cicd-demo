@@ -12,12 +12,10 @@ pipeline {
 
     environment {
         DOCKER_CREDENTIAL_ID = 'harbor-user-pass'
-        GIT_REPO_URL = '192.168.113.121:28080'
-        GIT_CREDENTIAL_ID = 'git-user-pass'
-        GIT_ACCOUNT = 'gitlab-instance-1a76a240' // change me
-        KUBECONFIG_CREDENTIAL_ID = '546163de-4d55-40b9-9035-83b51d91260b'
-        REGISTRY = '192.168.113.122:8858'
-        DOCKERHUB_NAMESPACE = 'snapshots' // change me
+        GIT_REPO_URL = 'https://github.com/weiweier22/k8s-cicd-demo.git'
+        KUBECONFIG_CREDENTIAL_ID = '9a17a84b-fe7e-4ab6-bd38-4ac7cc8d2f39'
+        REGISTRY = '192.168.242.130:8858'
+        DOCKERHUB_NAMESPACE = 'library' // change me
         APP_NAME = 'k8s-cicd-demo'
         SONAR_CREDENTIAL_ID = 'sonarqube-token'
     }
@@ -26,7 +24,7 @@ pipeline {
 
         stage('checkout scm') {
             steps {
-                checkout scmGit(branches: [[name: "$BRANCH_NAME"]], extensions: [], userRemoteConfigs: [[credentialsId: "$GIT_CREDENTIAL_ID", url: 'http://192.168.113.121:28080/gitlab-instance-1a76a240/k8s-cicd-demo.git']])
+                checkout scmGit(branches: [[name: "$BRANCH_NAME"]], extensions: [], userRemoteConfigs: [[url: 'https://github.com/weiweier22/k8s-cicd-demo.git']])
             }
         }
 
@@ -87,12 +85,10 @@ pipeline {
             }
             steps {
                 input(id: 'release-image-with-tag', message: 'release image with tag?')
-                withCredentials([usernamePassword(credentialsId: "$GIT_CREDENTIAL_ID", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    sh 'git config --global user.email "liugang@wolfcode.cn" '
-                    sh 'git config --global user.name "xiaoliu" '
-                    sh 'git tag -a $TAG_NAME -m "$TAG_NAME" '
-                    sh 'git push http://$GIT_USERNAME:$GIT_PASSWORD@$GIT_REPO_URL/$GIT_ACCOUNT/k8s-cicd-demo.git --tags --ipv4'
-                }
+                sh 'git config --global user.email "liugang@wolfcode.cn" '
+                sh 'git config --global user.name "xiaoliu" '
+                sh 'git tag -a $TAG_NAME -m "$TAG_NAME" '
+                sh 'git push https://github.com/weiweier22/k8s-cicd-demo.git --tags'
                 sh 'docker tag $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BUILD_NUMBER $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:$TAG_NAME'
                 sh 'docker push $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:$TAG_NAME'
             }
